@@ -1,0 +1,37 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+
+# The lines bellow are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/need to use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+
+builds:
+  - main: ./pkg
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    binary:  'gpx_cloudeye-grafana_{{tolower .Os }}_{{tolower .Arch }}'
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    # use zip for windows archives
+   # wrap_in_directory: true
+    name_template: 'gpx_cloudeye-grafana_{{tolower .Os }}_{{tolower .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+        #gpx_cloudeye-grafana_darwin_amd64

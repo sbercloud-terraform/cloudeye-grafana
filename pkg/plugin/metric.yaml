@@ -1,0 +1,52 @@
+regions:
+  - ru-moscow-1
+
+## The following configuration takes effect after the "Get Metric Meta From Conf" switch is enabled and is used to configure the area/service/resource/metric list
+## The list of services can be changed as needed, see: https://support.hc.sbercloud.ru/usermanual/ces/en-us_topic_0202622212.html
+
+namespaces:
+  ru-moscow-1:
+    - SYS.ECS
+    - SYS.ELB
+
+## The list of indicators can be changed as needed, see: https://support.hc.sbercloud.ru/usermanual/ces/en-us_topic_0202622212.html
+
+metrics:
+  SYS.ECS|instance_id:
+    - cpu_util
+    - disk_read_bytes_rate
+    - disk_write_bytes_rate
+    - network_incoming_bytes_aggregate_rate
+  SYS.ELB|lbaas_instance_id,lbaas_listener_id:
+    - m1_cps
+    - m2_act_conn
+    - m3_inact_conn
+    - m9_abnormal_servers
+    - ma_normal_servers
+  SYS.RDS|postgresql_instance_id:
+    - rds003_iops
+    - rds004_bytes_in
+    - rds001_cpu_util
+    - rds040_transaction_logs_usage
+    - rds002_mem_util
+  SYS.RDS|postgresql_cluster_id:
+    - rds003_iops
+    - rds004_bytes_in
+    - rds001_cpu_util
+    - rds040_transaction_logs_usage
+    - rds002_mem_util
+
+## Instance list, dimension names are arranged in alphabetical order and separated by commas, instance IDs are configured in the corresponding order.
+dimensions:
+  instance_id:
+    - xxxxxxxx-x01
+    - xxx-001
+  ru-moscow-1|SYS.ELB:
+    lbaas_instance_id,lbaas_listener_id:
+      - xxxxxxxx-x01,xxxx-xxx00
+      - xxxxxxxx-x01,xxxx-xxx01
+  ru-moscow-1|SYS.RDS:
+    postgresql_instance_id:
+      - xxxxxxxx-x01
+    postgresql_cluster_id:
+      - xxxxxxxx-x01

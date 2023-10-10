@@ -1,0 +1,220 @@
+import React, { ChangeEvent, PureComponent } from 'react';
+import { InlineField, InlineFieldRow, InlineSwitch, LegacyForms, Tab, TabContent, TabsBar } from '@grafana/ui';
+import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { MyDataSourceOptions, MySecureJsonData } from './types';
+import './css/common.css';
+
+const { SecretFormField, FormField } = LegacyForms;
+
+// @ts-ignore
+interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData<unknown>> {}
+
+interface ConfigEditorState {
+  tabs: any[];
+}
+
+export class ConfigEditor extends PureComponent<Props, ConfigEditorState> {
+  constructor(props: Props) {
+    super(props);
+    this.props.options.jsonData.region = 'ru-moscow-1';
+    this.props.options.jsonData.cesEndpoint = 'ces.ru-moscow-1.hc.sbercloud.ru';
+    this.state = {
+      tabs: [{ label: 'Cloudru Mode', active: true }],
+    };
+  }
+
+  onCESEndpointChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      cesEndpoint: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  onProjectIdChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    const jsonData = {
+      ...options.jsonData,
+      projectId: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  onAKChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        accessKey: event.target.value,
+      },
+    });
+  };
+
+  onSKChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        secretKey: event.target.value,
+      },
+    });
+  };
+
+  onResetAK = () => {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        accessKey: false,
+      },
+      secureJsonData: {
+        ...options.secureJsonData,
+        accessKey: '',
+      },
+    });
+  };
+
+  onResetSK = () => {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        secretKey: false,
+      },
+      secureJsonData: {
+        ...options.secureJsonData,
+        secretKey: '',
+      },
+    });
+  };
+
+  onMetaConfChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    options.jsonData.metaConfEnabled = !options.jsonData.metaConfEnabled;
+    const jsonData = {
+      ...options.jsonData,
+      metaConfEnabled: options.jsonData.metaConfEnabled,
+    };
+    onOptionsChange({ ...options, jsonData });
+  };
+
+  resetForm() {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        accessKey: false,
+        secretKey: false,
+      },
+      secureJsonData: {
+        ...options.secureJsonData,
+        accessKey: '',
+        secretKey: '',
+      },
+      jsonData: {
+        iamEndpoint: '',
+        cesEndpoint: '',
+        projectId: '',
+        region: 'ru-moscow-1',
+      },
+    });
+  }
+
+  onTabChange(index: number) {
+    this.resetForm();
+    const res: object[] = [];
+    this.state.tabs.forEach((tab: any, idx: number) => {
+      const temp = {
+        label: tab.label,
+        active: idx === index,
+      };
+      res.push(temp);
+    });
+    this.setState({ tabs: res });
+  }
+
+  render() {
+    const { options } = this.props;
+    const { jsonData, secureJsonFields } = options;
+    const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
+    return (
+      <div>
+        <TabsBar>
+          {this.state.tabs.map((tab: any, index: number) => {
+            return (
+              <Tab
+                css="margin: 1px"
+                key={index}
+                label={tab.label}
+                active={tab.active}
+                onChangeTab={() => this.onTabChange(index)}
+              />
+            );
+          })}
+        </TabsBar>
+        <TabContent>
+          {this.state.tabs[0].active && (
+            <div className="gf-form-group">
+              <div className="form-line-style">
+                <FormField
+                  label="CES endpoint"
+                  labelWidth={10}
+                  inputWidth={20}
+                  onChange={this.onCESEndpointChange}
+                  value={jsonData.cesEndpoint || ''}
+                  placeholder="https://ces.ru-moscow-1.hc.sbercloud.ru"
+                />
+                <FormField
+                  label="Project ID"
+                  labelWidth={10}
+                  inputWidth={20}
+                  onChange={this.onProjectIdChange}
+                  value={jsonData.projectId || ''}
+                  placeholder="project id"
+                />
+              </div>
+              <div className="gf-form-inline">
+                <div className="gf-form">
+                  <SecretFormField
+                    isConfigured={(secureJsonFields && secureJsonFields.accessKey) as boolean}
+                    value={secureJsonData.accessKey || ''}
+                    label="IAM Access Key"
+                    placeholder="access key"
+                    labelWidth={10}
+                    inputWidth={20}
+                    onReset={this.onResetAK}
+                    onChange={this.onAKChange}
+                  />
+                  <SecretFormField
+                    isConfigured={(secureJsonFields && secureJsonFields.secretKey) as boolean}
+                    value={secureJsonData.secretKey || ''}
+                    label="IAM Secret Key"
+                    placeholder="secret key"
+                    labelWidth={10}
+                    inputWidth={20}
+                    onReset={this.onResetSK}
+                    onChange={this.onSKChange}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </TabContent>
+        <InlineFieldRow>
+          <InlineField
+            label="Get Metric Meta From Conf File"
+            tooltip="After turning on the switch, obtain the region/service/resource/metric list through metric.yaml configuration"
+          >
+            <InlineSwitch css="" onChange={this.onMetaConfChange} value={jsonData.metaConfEnabled || false} />
+          </InlineField>
+        </InlineFieldRow>
+      </div>
+    );
+  }
+}

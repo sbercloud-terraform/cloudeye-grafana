@@ -1,0 +1,61 @@
+regions:
+  - ru-moscow-1
+
+namespaces:
+  ru-moscow-1:
+    - SYS.ECS
+    - SYS.ELB
+    - AGT.ECS
+    - SYS.AS
+    - SYS.EVS
+    - SYS.OBS
+    - SYS.SFS
+    - SYS.VPC
+    - SYS.ELB
+    - SYS.NAT
+    - SYS.DMS
+    - SYS.DCS
+    - SYS.RDS
+    - SYS.DDS
+    - SYS.ES
+
+metrics:
+  SYS.ECS|instance_id:
+    - cpu_util
+    - disk_read_bytes_rate
+    - disk_write_bytes_rate
+    - network_incoming_bytes_aggregate_rate
+
+  SYS.ELB|lbaas_instance_id,lbaas_listener_id:
+    - m1_cps
+    - m2_act_conn
+    - m3_inact_conn
+    - m9_abnormal_servers
+    - ma_normal_servers
+  SYS.RDS|postgresql_instance_id:
+    - rds003_iops
+    - rds004_bytes_in
+    - rds001_cpu_util
+    - rds040_transaction_logs_usage
+    - rds002_mem_util
+  SYS.RDS|postgresql_cluster_id:
+    - rds003_iops
+    - rds004_bytes_in
+    - rds001_cpu_util
+    - rds040_transaction_logs_usage
+    - rds002_mem_util
+
+dimensions:
+  ru-moscow-1|SYS.ECS:
+    instance_id:
+      - xxx-001
+      - xxx-001
+  ru-moscow-1|SYS.ELB:
+    lbaas_instance_id,lbaas_listener_id:
+      - xxxxxxxx-x01,xxxx-xxx00
+      - xxxxxxxx-x01,xxxx-xxx01
+  ru-moscow-1|SYS.RDS:
+    postgresql_instance_id:
+      - xxx-001
+    postgresql_cluster_id:
+      - xxx-001
